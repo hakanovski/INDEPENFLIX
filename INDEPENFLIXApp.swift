@@ -1,156 +1,142 @@
 import SwiftUI
+import AVKit
+
+struct INDEPENFLIXApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}
 
 struct ContentView: View {
     @State private var email: String = ""
     @State private var password: String = ""
+    @State private var isLoggedIn = false
     
     var body: some View {
-        ZStack {
-            // Background image or color
-            Image("backgroundImage")
-                .resizable()
-                .scaledToFill()
-                .edgesIgnoringSafeArea(.all)
-                .overlay(Color.black.opacity(0.3)) // Add slight opacity for better text visibility
-            
-            VStack(spacing: 20) {
-                // Logo
-                Image("appLogo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 150, height: 150)
-                    .padding(.bottom, 40)
-                
-                // Email and Password Input Fields with darker placeholders
+        if isLoggedIn {
+            MainContentView()
+        } else {
+            ZStack {
+                Color.black.edgesIgnoringSafeArea(.all)
                 VStack(spacing: 20) {
-                    TextField("Username", text: $email)
-                        .padding()
-                        .background(Color.black)
-                        .cornerRadius(10)
-                        .keyboardType(.emailAddress)
-                        .autocapitalization(.none)
-                        .foregroundColor(.white) // Text color
-                        .accentColor(.green) // Cursor color
-                        .placeholder(when: email.isEmpty) {
-                            Text("Username")
-                                .foregroundColor(Color.gray) // Darker color for better contrast
-                        }
-                    
-                    SecureField("Password", text: $password)
-                        .padding()
-                        .background(Color.black)
-                        .cornerRadius(10)
-                        .foregroundColor(.white) // Text color
-                        .accentColor(.green) // Cursor color
-                        .placeholder(when: password.isEmpty) {
-                            Text("Password")
-                                .foregroundColor(Color.white) // Darker color for better contrast
-                        }
-                }
-                .padding(.horizontal, 40)
-                
-                // Forgot Password and Login Button
-                VStack(spacing: 15) {
-                    Button(action: {
-                        // Perform login action here
-                    }) {
-                        Text("Log In")
-                            .foregroundColor(.white)
+                    VStack(spacing: 20) {
+                        TextField("Username", text: $email)
                             .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.blue)
+                            .background(Color.gray.opacity(0.2))
                             .cornerRadius(10)
-                    }
-                    
-                    Button(action: {
-                        // Forgot password action
-                    }) {
-                        Text("Forgot Password?")
+                            .keyboardType(.emailAddress)
+                            .autocapitalization(.none)
                             .foregroundColor(.white)
-                            .font(.footnote)
+                            .accentColor(.green)
+                        
+                        SecureField("Password", text: $password)
+                            .padding()
+                            .background(Color.gray.opacity(0.2))
+                            .cornerRadius(10)
+                            .foregroundColor(.white)
+                            .accentColor(.green)
                     }
-                }
-                .padding(.horizontal, 40)
-                
-                // Social Login Buttons
-                VStack(spacing: 10) {
-                    Button(action: {
-                        // Log in with Google action
-                    }) {
-                        HStack {
-                            Image(systemName: "globe")
-                            Text("Log in with Google")
-                                .foregroundColor(.black)
-                        }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.white)
-                        .cornerRadius(10)
-                    }
+                    .padding(.horizontal, 40)
                     
-                    Button(action: {
-                        // Log in with Apple action
-                    }) {
-                        HStack {
-                            Image(systemName: "applelogo")
-                            Text("Log in with Apple")
-                                .foregroundColor(.black)
+                    VStack(spacing: 15) {
+                        Button(action: {
+                            if email == "test" && password == "test" {
+                                isLoggedIn = true
+                            }
+                        }) {
+                            Text("Log In")
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color.blue)
+                                .cornerRadius(10)
                         }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.white)
-                        .cornerRadius(10)
-                    }
-                    
-                    Button(action: {
-                        // Log in with Facebook action
-                    }) {
-                        HStack {
-                            Image(systemName: "f.square")
-                            Text("Log in with Facebook")
-                                .foregroundColor(.black)
+                        
+                        Button(action: {
+                            // Forgot password action
+                        }) {
+                            Text("Forgot Password?")
+                                .foregroundColor(.white)
+                                .font(.footnote)
                         }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.white)
-                        .cornerRadius(10)
                     }
+                    .padding(.horizontal, 40)
                 }
-                .padding(.horizontal, 40)
-                
-                // Sign Up Button
-                Button(action: {
-                    // Sign up action
-                }) {
-                    Text("Sign Up with Email")
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.green)
-                        .cornerRadius(10)
-                }
-                .padding(.top, 20)
-                .padding(.horizontal, 40)
             }
         }
     }
 }
 
-extension View {
-    func placeholder<Content: View>(
-        when shouldShow: Bool,
-        alignment: Alignment = .leading,
-        @ViewBuilder placeholder: () -> Content) -> some View {
+struct MainContentView: View {
+    let videos = ["Bostanli.MP4", "Breakfast.mov", "Dukkanda.MOV", "Fast Plane.MOV", "Kebap Family.mov", "Kusadasi.mov", "Mila's World in 7 Seconds.mov", "Portal.MP4", "Slow Mo Jump.mov", "Turkish Girl.MOV"]
+    
+    var body: some View {
+        VStack {
+            Text("Your Films")
+                .font(.largeTitle)
+                .padding(.top, 50)
             
-            ZStack(alignment: alignment) {
-                placeholder().opacity(shouldShow ? 1 : 0)
-                self
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 20) {
+                    ForEach(videos, id: \.self) { video in
+                        VideoThumbnailView(videoName: video)
+                    }
+                }
+                .padding(.horizontal, 20)
             }
+            .frame(height: 200)
+            
+            Spacer()
         }
-}
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
+        .background(Color.black.edgesIgnoringSafeArea(.all))
     }
 }
+
+struct VideoThumbnailView: View {
+    let videoName: String
+    
+    var body: some View {
+        VStack {
+            Image(systemName: "video") // Placeholder image; replace with actual thumbnail images.
+                .resizable()
+                .scaledToFit()
+                .frame(width: 150, height: 100)
+                .cornerRadius(10)
+            Text(videoName)
+                .foregroundColor(.white)
+                .padding(.top, 5)
+        }
+        .onTapGesture {
+            // Handle different file extensions
+            if videoName.contains(".MP4") {
+                playVideo(named: videoName.replacingOccurrences(of: ".MP4", with: ""), withExtension: "MP4")
+            } else if videoName.contains(".mov") {
+                playVideo(named: videoName.replacingOccurrences(of: ".mov", with: ""), withExtension: "mov")
+            } else if videoName.contains(".MOV") {
+                playVideo(named: videoName.replacingOccurrences(of: ".MOV", with: ""), withExtension: "MOV")
+            } else {
+                print("Unsupported video format")
+            }
+        }
+    }
+    
+    func playVideo(named: String, withExtension: String) {
+        guard let url = Bundle.main.url(forResource: named, withExtension: withExtension) else {
+            print("Video not found: \(named).\(withExtension)")
+            return
+        }
+        
+        let player = AVPlayer(url: url)
+        let playerViewController = AVPlayerViewController()
+        playerViewController.player = player
+        
+        if let rootVC = UIApplication.shared.windows.first?.rootViewController {
+            rootVC.present(playerViewController, animated: true) {
+                player.play()
+            }
+        }
+    }
+}
+
