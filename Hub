@@ -1,0 +1,20 @@
+-- First, try to find and click the image
+try
+    Click "button_image.png"  -- Attempt to click on the image
+    log "Image found and clicked"
+catch
+    logWarning "Image not found, attempting OCR-based text recognition"
+    
+    -- If the image is not found, use OCR to recognize the text and click it
+    try
+        Set the OcrSearchRectangle to (100,100,400,200)  -- Define the OCR search area
+        Set the OcrIgnoreSpaces to Yes
+        Set the OcrLanguage to "English"
+        Set the OcrConfidence to 85  -- Set confidence level (e.g., 85%)
+
+        Click (Text:"Login", OcrConfidence:85)  -- Click the text using OCR
+        log "Text found and clicked using OCR"
+    catch
+        logError "Neither the image nor the text was found"
+    end try
+end try
